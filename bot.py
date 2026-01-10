@@ -1,35 +1,57 @@
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
+import telebot
 import subprocess
 
-# Masukkan TOKEN dari BotFather
 TOKEN = "8206837693:AAGQB86CiT7g2wZOFg73daDA4Jg4MMZWE8c"
 
-def start(update: Update, context: CallbackContext):
-    update.message.reply_text("Bot CPM aktif! Gunakan /rank_cpm1 atau /rank_cpm2")
+# 👑 DAFTAR USER YANG BOLEH MENGGUNAKAN BOT
+# Tambahkan ID Telegram siapa saja di sini
+ALLOWED_USERS = [
+    6095762919,   # kamu
+    8458676120,   # user lain
+]
 
-def rank_cpm1(update: Update, context: CallbackContext):
-    update.message.reply_text("Menjalankan CPM1...")
-    # jalankan script cpm1.py
+bot = telebot.TeleBot(TOKEN)
+
+def is_allowed(message):
+    return message.from_user.id in ALLOWED_USERS
+
+def deny(message):
+    bot.reply_to(message, "⛔ Kamu tidak diizinkan menggunakan bot ini")
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    if not is_allowed(message):
+        deny(message)
+        return
+
+    bot.reply_to(
+        message,
+        "🤖 Bot Rank King CPM Aktif\n\n"
+        "👑 Mode:USER\n\n"
+        "📌 Command:\n"
+        "/rankcpm1\n"
+        "/rankcpm2"
+    )
+
+@bot.message_handler(commands=['rankcpm1'])
+def rankcpm1(message):
+    if not is_allowed(message):
+        deny(message)
+        return
+
+    bot.reply_to(message, "⏳ Menjalankan Rank King CPM 1...")
     result = subprocess.getoutput("python cpm1.py")
-    update.message.reply_text(f"Hasil CPM1:\n{result}")
+    bot.send_message(message.chat.id, f"✅ Hasil CPM1:\n{result}")
 
-def rank_cpm2(update: Update, context: CallbackContext):
-    update.message.reply_text("Menjalankan CPM2...")
-    # jalankan script cpm2.py
+@bot.message_handler(commands=['rankcpm2'])
+def rankcpm2(message):
+    if not is_allowed(message):
+        deny(message)
+        return
+
+    bot.reply_to(message, "⏳ Menjalankan Rank King CPM 2...")
     result = subprocess.getoutput("python cpm2.py")
-    update.message.reply_text(f"Hasil CPM2:\n{result}")
+    bot.send_message(message.chat.id, f"✅ Hasil CPM2:\n{result}")
 
-def main():
-    updater = Updater(TOKEN)
-    dp = updater.dispatcher
-
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("rank_cpm1", rank_cpm1))
-    dp.add_handler(CommandHandler("rank_cpm2", rank_cpm2))
-
-    updater.start_polling()
-    updater.idle()
-
-if __name__ == "__main__":
-    main()
+print("🤖 Bot berjalan")
+bot.infinity_polling()
