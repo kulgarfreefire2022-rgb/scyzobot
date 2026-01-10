@@ -32,7 +32,7 @@ def can_inject(uid):
     if uid not in daily_usage or daily_usage[uid]["date"] != today:
         daily_usage[uid] = {"date": today, "count": 0}
 
-    return daily_usage[uid]["count"] < 1
+    return daily_usage[uid]["count"] < 3
 
 def increase_usage(uid):
     today = str(date.today())
