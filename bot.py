@@ -106,7 +106,7 @@ def cpm_menu(cpm):
 @bot.message_handler(commands=['start'])
 def start(message):
     uid = message.from_user.id
-    status = "💎 PREMIUM (Unlimited)" if is_premium(uid) else "🆓 FREE (1x / hari)"
+    status = "💎 PREMIUM (Unlimited)" if is_premium(uid) else "🆓 FREE (3x / hari)"
 
     bot.send_message(
         message.chat.id,
@@ -149,7 +149,7 @@ def callback(call):
             bot.send_message(
                 call.message.chat.id,
                 "⛔ *LIMIT FREE TERCAPAI*\n\n"
-                "FREE hanya 1x / hari.\n"
+                "FREE hanya 3x / hari.\n"
                 "Upgrade PREMIUM untuk akses fitur premium di @AWIMEDAN0",
                 parse_mode="Markdown"
             )
@@ -213,7 +213,7 @@ def login_flow(message):
         if not is_premium(uid):
             increase_usage(uid)
 
-        bot.send_message(message.chat.id, "🔥 Inject Rank King, mohon tunggu...")
+        bot.send_message(message.chat.id, "⏳️Inject Rank King, mohon tunggu...")
 
         script = "cpm1.py" if tool == "cpm1" else "cpm2.py"
         cmd = f'printf "{email}\\n{password}\\n" | python {script}'
